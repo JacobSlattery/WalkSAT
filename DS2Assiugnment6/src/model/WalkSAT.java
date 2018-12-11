@@ -3,6 +3,7 @@ package model;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
@@ -15,8 +16,14 @@ public class WalkSAT {
 	private ArrayList<ArrayList<Integer>> clauses;
 	private ArrayList<Integer> variables;
 	private HashMap<Integer, Boolean> map;
-	private ArrayList<Integer> constants;
+	private Random random;
+	private HashMap<ArrayList<Integer>, Boolean> satisfiedClauseMap;
 	
+	
+	public WalkSAT() {
+		this.random = new Random();
+		this.satisfiedClauseMap = new HashMap<ArrayList<Integer>, Boolean>();
+	}
 	
 	public boolean run() {
 		
@@ -26,19 +33,25 @@ public class WalkSAT {
 		
 		boolean end = false;
 		int count = 1;
-		Random random = new Random();
 		
 		while(!this.doesMapSatisfyClauses()) {
+//			System.out.println("Satisfied: " + this.satisfiedClauseMap);
+//			System.out.println("Map: " + this.map);
 			int key;
-			int index = random.nextInt(this.variables.size());
+			int index = this.random.nextInt(this.variables.size());
 			key = this.variables.get(index);
-			this.flipValueAt(key);
-			if (count % 10000000 == 0) {
+			this.tryFlip(key);
+			if (count % 1000000 == 0) {
 				System.out.println(String.format("%,d", count));
 			}
+			if (count % 1000 == 0) {
+				this.initializeMap();
+			}
+
 			count++;
 		}		
 		
+		System.out.println();
 		System.out.println("Clauses: " + this.clauses);
 		System.out.println("Variables: " + this.variables);
 		System.out.println("Map: " + this.map);
@@ -49,8 +62,25 @@ public class WalkSAT {
 	}
 	
 	
-	private void findConstant() {
+	
+	private void tryFlip(Integer key) {
+
+		int lastCount = this.getSatisfiedCount();
+		this.flipValueAt(key);
 		
+		if (lastCount > this.getSatisfiedCount()) {
+			int successAmount = this.satisfiedClauseMap.size() - lastCount;
+			if (successAmount > this.random.nextInt(this.map.keySet().size() + 1)) {
+				this.flipValueAt(key);
+			}
+		}
+
+	}
+	
+	
+	private int getSatisfiedCount() {
+		Collection<Boolean> lastList = (Collection<Boolean>) this.satisfiedClauseMap.values();
+		return (int) lastList.stream().filter(t -> t == true).count();
 	}
 	
 	
@@ -63,23 +93,25 @@ public class WalkSAT {
 	private boolean doesMapSatisfyClauses() {
 		boolean pass = true;
 		for(ArrayList<Integer> clause : this.clauses) {
-			pass = pass && this.clauseValue(clause, this.map);
+			Boolean current = this.clauseValue(clause);
+			this.satisfiedClauseMap.put(clause, current);
+			pass = pass && current;
 		}
 		return pass;
 	}
 	
-	private boolean clauseValue(ArrayList<Integer> clause, HashMap<Integer, Boolean> map) {
-		boolean value = false;
-		
+	private boolean clauseValue(ArrayList<Integer> clause) {		
 		for (Integer number : clause) {
-			boolean mapBool = map.get(Math.abs(number));
+			boolean mapBool = this.map.get(Math.abs(number));
 			if (number < 0) {
 				mapBool = !mapBool;
 			}
-			value = value || mapBool;
+			if (mapBool == true) {
+				return true;
+			}
 		}
 		
-		return value;
+		return false;
 	}
 	
 	
@@ -106,7 +138,6 @@ public class WalkSAT {
 	
 	
 	private void populateClauses(String filename) {
-		
 		this.clauses = new ArrayList<ArrayList<Integer>>();
 
 		Scanner scanner = null;
@@ -115,8 +146,6 @@ public class WalkSAT {
 			while (scanner.hasNextLine()) {
 				ArrayList<Integer> clause = new ArrayList<Integer>();
 				String[] splitLine = scanner.nextLine().split(" ");
-				
-
 				
 				for (String integer : splitLine) {
 					clause.add(Integer.parseInt(integer));
@@ -128,7 +157,5 @@ public class WalkSAT {
 		}
 	}
 	
-	
-	
-	
+
 }
