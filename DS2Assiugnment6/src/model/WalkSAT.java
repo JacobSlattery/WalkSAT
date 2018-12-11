@@ -3,7 +3,6 @@ package model;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
@@ -15,7 +14,9 @@ public class WalkSAT {
 	
 	private ArrayList<ArrayList<Integer>> clauses;
 	private ArrayList<Integer> variables;
-	HashMap<Integer, Boolean> map;
+	private HashMap<Integer, Boolean> map;
+	private ArrayList<Integer> constants;
+	
 	
 	public boolean run() {
 		
@@ -27,11 +28,10 @@ public class WalkSAT {
 		int count = 1;
 		Random random = new Random();
 		while(!this.doesMapSatisfyClauses()) {
-			int key = 0;
-			while (key == 0) {
-				key = Math.abs(random.nextInt()) % Collections.max(this.variables);
-			}
-			key++;
+			int key;
+			int index = random.nextInt(this.variables.size());
+			key = this.variables.get(index);
+			
 			this.flipValueAt(key);
 			if (count % 10000000 == 0) {
 				System.out.println(count);
@@ -40,12 +40,17 @@ public class WalkSAT {
 		}
 		
 		
-		System.out.println("Clauses: " + clauses);
-		System.out.println("Variables: " + variables);
-		System.out.println("Map: " + map);
+		System.out.println("Clauses: " + this.clauses);
+		System.out.println("Variables: " + this.variables);
+		System.out.println("Map: " + this.map);
 		System.out.println("Count: " + count);
 		System.out.println(this.doesMapSatisfyClauses());
 		return end;
+		
+	}
+	
+	
+	private void findConstant() {
 		
 	}
 	
@@ -111,6 +116,8 @@ public class WalkSAT {
 			while (scanner.hasNextLine()) {
 				ArrayList<Integer> clause = new ArrayList<Integer>();
 				String[] splitLine = scanner.nextLine().split(" ");
+				
+
 				
 				for (String integer : splitLine) {
 					clause.add(Integer.parseInt(integer));
