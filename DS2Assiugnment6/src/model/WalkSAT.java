@@ -11,7 +11,7 @@ import java.util.Scanner;
 public class WalkSAT {
 	
 	
-	public static final String FILENAME = "Test.txt";
+	public static final String FILENAME = "SAT_Expression01.txt";
 	
 	private ArrayList<ArrayList<Integer>> clauses;
 	private ArrayList<Integer> variables;
@@ -26,24 +26,23 @@ public class WalkSAT {
 		boolean end = false;
 		int count = 1;
 		Random random = new Random();
+		
 		while(!this.doesMapSatisfyClauses()) {
-			int key = 0;
-			while (key == 0) {
-				key = Math.abs(random.nextInt()) % Collections.max(this.variables);
-			}
-			key++;
+			int key;
+			int index = Math.abs(random.nextInt()) % (this.variables.size()-1);
+			key = this.variables.get(index);
+			
 			this.flipValueAt(key);
 			if (count % 10000000 == 0) {
-				System.out.println(count);
+				System.out.println(String.format("%,d", count));
 			}
 			count++;
-		}
-		
+		}		
 		
 		System.out.println("Clauses: " + clauses);
 		System.out.println("Variables: " + variables);
 		System.out.println("Map: " + map);
-		System.out.println("Count: " + count);
+		System.out.println("Count: " + (String.format("%,d", count)));
 		System.out.println(this.doesMapSatisfyClauses());
 		return end;
 		
