@@ -44,7 +44,7 @@ public class WalkSAT {
 			if (count % 1000000 == 0) {
 				System.out.println(String.format("%,d", count));
 			}
-			if (count % 1000 == 0) {
+			if (count % 10000 == 0) {
 				this.initializeMap();
 			}
 
