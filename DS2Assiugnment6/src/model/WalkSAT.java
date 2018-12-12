@@ -38,8 +38,6 @@ public class WalkSAT {
 		int count = 1;
 
 		while (!this.doesMapSatisfyClauses()) {
-//			System.out.println("Satisfied: " + this.satisfiedClauseMap);
-//			System.out.println("Map: " + this.map);
 			int key;
 			int index = this.random.nextInt(this.variables.size());
 			key = this.variables.get(index);
@@ -48,17 +46,15 @@ public class WalkSAT {
 				index = this.random.nextInt(this.variables.size());
 				key = this.variables.get(index);
 			}
-			
-			
+						
 			this.tryFlip(key);
-			if (count % 1000000 == 0) {
-				
-			}
-			if (count % 100000 == 0) {
+			
+			if (count % 10000 == 0) {
 				System.out.println(String.format("%,d", count));
 				System.out.println("flips not taken = " + flipsNotTaken);
 				this.initializeMap();
 				flipsNotTaken = 0;
+				count = 0;
 			}
 
 			count++;
@@ -77,28 +73,18 @@ public class WalkSAT {
 	private void tryFlip(Integer key) {
 
 		int lastCount = this.getSatisfiedCount();
-		//System.out.println(lastCount);
+		
 		this.flipValueAt(key);
 		doesMapSatisfyClauses();
-		//System.out.println(this.getSatisfiedCount());
+		
 		if (lastCount > this.getSatisfiedCount()) {
-			//System.out.println("Wrong Move");
-			//System.out.println("Last Count = " + lastCount);
-			//System.out.println("Current Count = " + this.getSatisfiedCount());
-			
 			float successChance = (float)1 - ((float)this.getSatisfiedCount() / (float)lastCount);
 			float successRoll = (float)(this.random.nextInt(100)) / (float)100;
-			//System.out.println(successRoll);
-			//System.out.println(successChance);
+			
 			if(successRoll > successChance) {
 				this.flipValueAt(key);
 				flipsNotTaken++;
 			}
-			
-			//int successAmount = this.satisfiedClauseMap.size() - lastCount;
-			//if (successAmount > this.random.nextInt(this.map.keySet().size() + 1)) {
-			//	this.flipValueAt(key);
-			//}
 		}
 
 	}
@@ -162,8 +148,6 @@ public class WalkSAT {
 		}
 	}
 	
-	
-
 	private void populateVariables() {
 		this.variables = new ArrayList<Integer>();
 		for (ArrayList<Integer> clause : clauses) {
