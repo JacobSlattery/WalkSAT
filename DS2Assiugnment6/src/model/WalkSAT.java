@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -21,6 +20,9 @@ public class WalkSAT {
 	private ArrayList<Integer> finalVariables;
 	private int flipsNotTaken;
 
+	/**
+	 * Initializes a WalkSAT object
+	 */
 	public WalkSAT() {
 		this.random = new Random();
 		this.satisfiedClauseMap = new HashMap<ArrayList<Integer>, Boolean>();
@@ -28,6 +30,13 @@ public class WalkSAT {
 		this.flipsNotTaken = 0;
 	}
 
+
+	/**
+	 * Runs the WalkSAT algorithm
+	 * @Precondition none
+	 * @Postcondition none 
+	 * @return true, if successful
+	 */
 	public boolean run() {
 
 		this.populateClauses(FILENAME);
